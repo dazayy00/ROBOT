@@ -14,17 +14,14 @@ public class Sensor extends ComponenteRobot{
     public Sensor(String tipo){
         this.tipo = tipo;
     }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
     
     @Override
-    public String getDetalles(){
-        return tipo;
+    public String getDetalles() {
+        return "Sensor:  "+ tipo;
+    }
+
+    @Override
+    public String toString() {
+        return "Sensor: "+ tipo;
     }
 }

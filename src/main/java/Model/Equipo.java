@@ -50,4 +50,8 @@ public class Equipo {
         return mentor;
     }
     
+    @Override
+    public String toString() {
+        return "Equipo: " + nombre; 
+    }
 } 

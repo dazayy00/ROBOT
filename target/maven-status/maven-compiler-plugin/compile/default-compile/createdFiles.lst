@@ -1,4 +1,3 @@
-Gui\Main.class
 Model\Torneo.class
 robot\Actuador.class
 robot\Main.class
@@ -11,6 +10,7 @@ Model\Equipo.class
 Model\Robot.class
 robot\Alumno.class
 robot\Torneo.class
+Gui\GestorTorneoApp.class
 Services\TorneoService.class
 Model\Persona.class
 Model\Controlador.class

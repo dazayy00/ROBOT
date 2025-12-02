@@ -15,37 +15,24 @@ public class TorneoService {
     
     public String obtenerInfoEquipo(Equipo equipo){
         StringBuilder info = new StringBuilder();
-        info.append("===================\n");
-        info.append("Equipo : ").append(equipo.getNombre()).append("\n");
-        
-        if(equipo.getMentor() != null){
-            info.append("Mentor : ").append(equipo.getMentor().getNombre()).append("\n");
-        }
+        info.append("--- DETALLE EQUIPO ---\n");
+        info.append("Nombre: ").append(equipo.getNombre()).append("\n");
+        if(equipo.getMentor() != null) info.append("Mentor: ").append(equipo.getMentor().getNombre()).append("\n");
         if(equipo.getRobot() != null){
-            info.append("Robot asignado : ").append(equipo.getRobot().getIdRobot()).append("\n");
-            info.append("Componentes del robot \n");
-            equipo.getRobot().getComponentes().forEach(componente ->
-                    info.append(" - ").append(componente.getDetalles()).append("\n")
-            );
+            info.append("Robot: ").append(equipo.getRobot().getIdRobot()).append("\n");
+            info.append("  Componentes:\n");
+            equipo.getRobot().getComponentes().forEach(c -> info.append("   - ").append(c.getDetalles()).append("\n"));
         }
-        
         info.append("Integrantes:\n");
-        equipo.getAlumnos().forEach(alumno ->
-                info.append(" - ").append(alumno.getNombre()).append("\n")
-        );
-        info.append("=======================\n");
+        equipo.getAlumnos().forEach(a -> info.append(" - ").append(a.getNombre()).append("\n"));
+        info.append("----------------------\n");
         return info.toString();
     }
     
     public String obtenerEquiposParticipantes(Torneo torneo){
         StringBuilder lista = new StringBuilder();
-        lista.append("\n Equipos participantes en el torneo: ")
-                .append(torneo.getNombre())
-                .append("(").append(torneo.getSede()).append(") ----");
-        
-        torneo.getEquiposInscritos().forEach(equipo ->
-                lista.append(" \n* ").append(equipo.getNombre())
-        );
+        lista.append("TORNEO: ").append(torneo.getNombre()).append(" | SEDE: ").append(torneo.getSede()).append("\n");
+        torneo.getEquiposInscritos().forEach(e -> lista.append("* ").append(e.getNombre()).append("\n"));
         return lista.toString();
     }
 }

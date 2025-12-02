@@ -23,8 +23,4 @@ public class Alumno extends Persona {
         return "Alumno";
     }
     
-    @Override
-    public String toString(){
-        return id + nombre;
-    }
 }

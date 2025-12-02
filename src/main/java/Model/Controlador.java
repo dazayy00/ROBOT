@@ -17,24 +17,13 @@ public class Controlador extends ComponenteRobot{
         this.modelo = modelo;
     }
 
-    public String getFirmware() {
-        return firmware;
+  @Override
+    public String getDetalles() {
+        return "Controlador: "+ modelo + " (v" + firmware + ")";
     }
 
-    public void setFirmware(String firmware) {
-        this.firmware = firmware;
-    }
-
-    public String getModelo() {
-        return modelo;
-    }
-
-    public void setModelo(String modelo) {
-        this.modelo = modelo;
-    }
-    
     @Override
-    public String getDetalles(){
-        return firmware + modelo;
+    public String toString() {
+        return "Controlador: "+ modelo;
     }
 }

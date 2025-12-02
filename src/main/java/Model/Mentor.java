@@ -14,18 +14,9 @@ public class Mentor extends Persona{
         super(idMentor, nombre);
     }
     
-    public String getIdMentor(){
-        return id;
-    }    
-    
     @Override
     public String getRol(){
         return "Mentor";
     }
-
-    @Override
-    public String toString() {
-        return id + nombre;
-    }    
     
 }

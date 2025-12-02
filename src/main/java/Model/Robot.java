@@ -32,4 +32,9 @@ public class Robot {
     public List<ComponenteRobot> getComponentes() {
         return componentes;
     }
+    
+    @Override
+    public String toString() { 
+        return "Robot ID: " + idRobot; 
+    }
 }

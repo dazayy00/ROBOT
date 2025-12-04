@@ -1,11 +1,13 @@
 Model\Torneo.class
 robot\Actuador.class
 robot\Main.class
+Services\RobotService.class
 robot\Mentor.class
 Model\Actuador.class
 robot\Robot.class
 robot\Sensor.class
 Model\ComponenteRobot.class
+Services\EquipoService.class
 Model\Equipo.class
 Model\Robot.class
 robot\Alumno.class

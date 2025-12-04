@@ -1,8 +1,11 @@
 package Gui;
 
 import Model.*;
+import Services.EquipoService;
+import Services.RobotService;
 import Services.TorneoService;
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.*;
 import javax.swing.*;
@@ -14,7 +17,10 @@ public class GestorTorneoApp extends JFrame {
     private ArrayList<Robot> listaRobots = new ArrayList<>();
     private ArrayList<Equipo> listaEquipos = new ArrayList<>();
     private Torneo torneoActual;
-    private TorneoService servicio = new TorneoService();
+
+    private RobotService robotService = new RobotService();
+    private EquipoService equipoService = new EquipoService();
+    private TorneoService torneoService = new TorneoService();
 
     private JComboBox<Mentor> comboMentoresEquipo;
     private JComboBox<Robot> comboRobotsEquipo;
@@ -25,19 +31,16 @@ public class GestorTorneoApp extends JFrame {
     private JTextArea areaResultados;
 
     public GestorTorneoApp() {
-        setTitle("Sistema de Gestión de Robótica");
-        setSize(900, 600);
+        setTitle("Sistema de Gestión de Robótica (Arquitectura en Capas)");
+        setSize(950, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JTabbedPane tabs = new JTabbedPane();
 
         tabs.addTab("1. Registros Básicos", crearPanelRegistros());
-
         tabs.addTab("2. Configurar Robot", crearPanelComponentes());
-
         tabs.addTab("3. Armar Equipos", crearPanelEquipos());
-
         tabs.addTab("4. Gestión Torneo", crearPanelTorneo());
 
         add(tabs);
@@ -101,14 +104,14 @@ public class GestorTorneoApp extends JFrame {
     private JPanel crearPanelComponentes() {
         JPanel panel = new JPanel(new BorderLayout());
         JPanel form = new JPanel(new GridLayout(5, 2, 5, 5));
-        form.setBorder(BorderFactory.createTitledBorder("Agregar Componentes a Robot Existente"));
+        form.setBorder(BorderFactory.createTitledBorder("Agregar Componentes (RobotService)"));
 
         comboRobotsComponente = new JComboBox<>();
         String[] tipos = {"Sensor", "Actuador", "Controlador"};
         JComboBox<String> comboTipoComp = new JComboBox<>(tipos);
         JTextField txtDetalle1 = new JTextField();
         JTextField txtDetalle2 = new JTextField();
-        JButton btnAgregarComp = new JButton("Agregar Componente");
+        JButton btnAgregarComp = new JButton("Instalar Componente");
 
         form.add(new JLabel("Seleccionar Robot:")); form.add(comboRobotsComponente);
         form.add(new JLabel("Tipo Componente:")); form.add(comboTipoComp);
@@ -136,8 +139,10 @@ public class GestorTorneoApp extends JFrame {
                     comp = new Controlador(txtDetalle1.getText(), txtDetalle2.getText());
                     break;
             }
-            r.agregarComponente(comp);
-            JOptionPane.showMessageDialog(this, "Componente agregado al robot " + r.getIdRobot());
+
+            robotService.instalarComponente(r, comp);
+            
+            JOptionPane.showMessageDialog(this, "Componente instalado en " + r.getIdRobot());
             limpiarCampos(txtDetalle1, txtDetalle2);
         });
 
@@ -148,7 +153,7 @@ public class GestorTorneoApp extends JFrame {
     private JPanel crearPanelEquipos() {
         JPanel panel = new JPanel(new BorderLayout());
         JPanel form = new JPanel(new GridLayout(6, 2, 5, 5));
-        form.setBorder(BorderFactory.createTitledBorder("Armar Equipo"));
+        form.setBorder(BorderFactory.createTitledBorder("Armar Equipo (EquipoService)"));
 
         JTextField txtNombreEquipo = new JTextField();
         comboMentoresEquipo = new JComboBox<>();
@@ -160,7 +165,7 @@ public class GestorTorneoApp extends JFrame {
         JTextArea txtListaAlumnos = new JTextArea(3, 20);
         txtListaAlumnos.setEditable(false);
 
-        JButton btnCrearEquipo = new JButton("Finalizar Creación Equipo");
+        JButton btnCrearEquipo = new JButton("Registrar Equipo Completo");
 
         form.add(new JLabel("Nombre Equipo:")); form.add(txtNombreEquipo);
         form.add(new JLabel("Mentor:")); form.add(comboMentoresEquipo);
@@ -188,11 +193,14 @@ public class GestorTorneoApp extends JFrame {
                 JOptionPane.showMessageDialog(this, "Nombre o alumnos faltantes.");
                 return;
             }
+            
             Equipo nuevoEquipo = new Equipo(txtNombreEquipo.getText());
             nuevoEquipo.asignarMentor((Mentor) comboMentoresEquipo.getSelectedItem());
             nuevoEquipo.asignarRobot((Robot) comboRobotsEquipo.getSelectedItem());
             
-            for(Alumno a : alumnosTemp) nuevoEquipo.agregarAlumno(a);
+            for(Alumno a : alumnosTemp) {
+                equipoService.registrarAlumno(nuevoEquipo, a);
+            }
             
             listaEquipos.add(nuevoEquipo);
             JOptionPane.showMessageDialog(this, "Equipo " + nuevoEquipo.getNombre() + " creado!");
@@ -221,14 +229,15 @@ public class GestorTorneoApp extends JFrame {
 
         JPanel middle = new JPanel(new GridLayout(2, 2));
         comboEquiposTorneo = new JComboBox<>();
-        JButton btnInscribir = new JButton("Inscribir Equipo");
-        JButton btnVerEquipos = new JButton("Ver Lista Equipos");
-        JButton btnVerDetalle = new JButton("Ver Detalle Equipo Seleccionado");
+        JButton btnInscribir = new JButton("Inscribir Equipo (TorneoService)");
+        JButton btnVerEquipos = new JButton("Ver Reporte Torneo");
+        JButton btnVerDetalle = new JButton("Ver Ficha Equipo (EquipoService)");
 
         middle.add(new JLabel("Seleccionar Equipo:")); middle.add(comboEquiposTorneo);
         middle.add(btnInscribir); middle.add(btnVerEquipos);
         
         areaResultados = new JTextArea();
+        areaResultados.setFont(new Font("Monospaced", Font.PLAIN, 12)); // Fuente monoespaciada para mejores reportes
         
         btnInitTorneo.addActionListener(e -> {
             torneoActual = new Torneo(txtTorneo.getText(), txtSede.getText());
@@ -243,19 +252,21 @@ public class GestorTorneoApp extends JFrame {
             }
             Equipo eq = (Equipo) comboEquiposTorneo.getSelectedItem();
             if(eq != null) {
-                torneoActual.inscribirEquipo(eq);
-                areaResultados.append("\nEquipo " + eq.getNombre() + " inscrito.");
+                torneoService.registrarEquipoEnTorneo(torneoActual, eq);
+                areaResultados.append("\nSolicitud de inscripción procesada para: " + eq.getNombre());
             }
         });
 
         btnVerEquipos.addActionListener(e -> {
             if(torneoActual != null) 
-                areaResultados.setText(servicio.obtenerEquiposParticipantes(torneoActual));
+                areaResultados.setText(torneoService.obtenerReporteInscritos(torneoActual));
         });
 
         btnVerDetalle.addActionListener(e -> {
              Equipo eq = (Equipo) comboEquiposTorneo.getSelectedItem();
-             if(eq != null) areaResultados.setText(servicio.obtenerInfoEquipo(eq));
+             if(eq != null) {
+                 areaResultados.setText(equipoService.obtenerFichaCompleta(eq));
+             }
         });
 
         panel.add(top, BorderLayout.NORTH);
